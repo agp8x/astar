@@ -85,12 +85,12 @@ def update_front(front, position, target, path=None):
         if node in front or node in visited:
             continue
         estimate = h(node, target)
-        new_front.append((node, estimate + len(path), (path, position)))
+        new_front.append((node, estimate + len(path), path+ [position]))
         if not node == start:
             ax.plot(node[0], node[1], 'b+')
     return new_front
 
-front = [(start, h(start, target),start)]
+front = [(start, h(start, target),[start])]
 #update_front(front, start, target)
 
 #print(front)
@@ -109,11 +109,16 @@ def clear_front(front):
             nodes[position] = candidate
     return [nodes[pos] for pos in nodes]
             
-            
+final_path = []
+done = False
 
 def animate(i):
-    global front
-    if i == 0 or (i>2 and not front):
+    global front, final_path, done
+    if i == 0 or done:
+        return
+    if len(final_path) > 0 and not done:
+        ax.add_line(plt.Polygon(final_path, closed=False, fill=False, edgecolor="r"))
+        done = True
         return
     #ax.plot(i/4, i/2, 'bo')
     min_step = min(list(zip(*front))[1])
@@ -124,8 +129,10 @@ def animate(i):
         if node[0] == target[0] and node[1] == target[1]:
             new_front = []
             front = []
+            final_path = path + [target]
             ax.plot(node[0], node[1], 'rx')
             print("target reached!")
+            print("path", candidate)
             break
         for entry in front:
             if node == entry[0]:
@@ -180,10 +187,11 @@ animate(39)
 #front"""
 
 
-anim = animation.FuncAnimation(fig, animate, interval=50, frames=40, repeat=False)
+anim = animation.FuncAnimation(fig, animate, interval=50, frames=130, repeat=False)
 
 #from IPython.display import HTML
 #HTML(anim.to_jshtml())
+
 #plt.show()
 
 #anim.save("draw.mp4")
